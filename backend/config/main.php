@@ -45,7 +45,14 @@ return [
             'rules' => [
             ],
         ],
-
+        'qiniu'=>[
+            'class'=>\backend\components\Qiniu::className(),
+            'up_host' => 'http://up-z2.qiniu.com',
+            'accessKey'=>'f8fs5H5cwZZk9iKTBrUTNZaF-hUfQNMtjxYXh0D1',
+            'secretKey'=>'48cepcr2jmrtCJDqzYNdpkQM-Rp5nnyebXl6qETC',
+            'bucket'=>'momota',
+            'domain'=>'http://or9tdz5h7.bkt.clouddn.com/'
+        ],
     ],
     'params' => $params,
 ];
