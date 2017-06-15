@@ -18,8 +18,8 @@ return [
             'csrfParam' => '_csrf-backend',
         ],
         'user' => [
-            'identityClass' => 'common\models\User',
-            'enableAutoLogin' => true,
+            'identityClass' => \backend\models\Admin::className(),
+            'enableAutoLogin' => true,//基于cookie的自动登录，需要打开
             'identityCookie' => ['name' => '_identity-backend', 'httpOnly' => true],
         ],
         'session' => [
