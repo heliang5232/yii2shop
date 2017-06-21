@@ -5,6 +5,7 @@ namespace backend\models;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\web\IdentityInterface;
+use yii\web\NotFoundHttpException;
 
 /**
  * This is the model class for table "admin".
@@ -23,6 +24,7 @@ use yii\web\IdentityInterface;
  */
 class Admin extends \yii\db\ActiveRecord implements IdentityInterface
 {
+    public $role=[];//用户的角色
     public $password;//保存密码的明文
     /*
      * 定义场景
@@ -64,6 +66,7 @@ class Admin extends \yii\db\ActiveRecord implements IdentityInterface
             [['username'], 'unique'],//on指定验证规则生效场景
             [['email'], 'unique'],
             [['email'], 'email'],
+            [['role'],'safe'],
             [['password_reset_token'], 'unique'],
         ];
     }
@@ -88,6 +91,49 @@ class Admin extends \yii\db\ActiveRecord implements IdentityInterface
         ];
     }
 
+    //获取所有角色
+    public static function getRoleOption()
+    {
+        $authManager = Yii::$app->authManager;
+        return ArrayHelper::map($authManager->getRoles(),'name','description');
+    }
+    //添加角色
+    public function addUser($id)
+    {
+        $authManager = Yii::$app->authManager;
+        foreach($this->role as $role){
+            $role = $authManager->getRole($role);
+            if($role){$authManager->assign($role,$id);}
+        }
+        return true;
+    }
+
+    //修改回显
+    public function loadData($roles)
+    {
+        foreach($roles as $role){
+            $this->role[] = $role->name;
+        }
+    }
+
+    //更新角色
+    public function updateRole($id)
+    {
+        $authManager = Yii::$app->authManager;
+        if(Admin::findOne(['id'=>$id])){
+            $authManager->revokeAll($id);
+            $roles = $this->role;
+            if($roles){
+                foreach($roles as $role){
+                    $authManager->assign($authManager->getRole($role),$id);
+                }
+            }
+            return true;
+        }else{
+            throw new NotFoundHttpException('错误');
+        }
+    }
+
     public function beforeSave($insert)
     {
         if($insert){
@@ -99,6 +145,7 @@ class Admin extends \yii\db\ActiveRecord implements IdentityInterface
         if($this->password){
             $this->password_hash = Yii::$app->security->generatePasswordHash($this->password);
         }
+
         return parent::beforeSave($insert);
     }
 
@@ -171,5 +218,5 @@ class Admin extends \yii\db\ActiveRecord implements IdentityInterface
         return $this->getAuthKey() == $authKey;
     }
 
-    
+
 }

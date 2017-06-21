@@ -8,6 +8,7 @@ $params = array_merge(
 
 return [
     'id' => 'app-backend',
+    'defaultRoute'=>'admin',//网站默认打开路径
     'basePath' => dirname(__DIR__),
     'controllerNamespace' => 'backend\controllers',
     'bootstrap' => ['log'],
@@ -18,9 +19,11 @@ return [
             'csrfParam' => '_csrf-backend',
         ],
         'user' => [
+            //'class'=> \yii\web\User::className(),
             'identityClass' => \backend\models\Admin::className(),
             'enableAutoLogin' => true,//基于cookie的自动登录，需要打开
             'identityCookie' => ['name' => '_identity-backend', 'httpOnly' => true],
+            'loginUrl'=>['admin/login'],
         ],
         'session' => [
             // this is the name of the session cookie used for login on the backend

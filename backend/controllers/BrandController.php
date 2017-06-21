@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use backend\components\RbacFilter;
 use backend\models\Brand;
 use yii\data\Pagination;
 use yii\web\NotFoundHttpException;
@@ -13,6 +14,15 @@ use crazyfd\qiniu\Qiniu;
 
 class BrandController extends \yii\web\Controller
 {
+    //使用过滤器，没权限不能通过url跳转访问
+    public function behaviors()
+    {
+        return [
+            'rbac'=>[
+                'class'=>RbacFilter::className(),
+            ]
+        ];
+    }
     //分页分类列表
     public function actionIndex()
     {
@@ -127,7 +137,8 @@ class BrandController extends \yii\web\Controller
                     $imgUrl = $action->getWebUrl();
                     //调用七牛云组件，将图片上传到七牛云
                     $qiniu = \Yii::$app->qiniu;
-                    $qiniu->uploadFile(\Yii::getAlias('@webroot').$imgUrl,$imgUrl);
+//                  $qiniu->uploadFile(\Yii::getAlias('@webroot').$imgUrl,$imgUrl);
+                    $qiniu->uploadFile($action->getSavePath(),$imgUrl);
                     //获取改图片在七牛云的地址
                     $url = $qiniu->getLink($imgUrl);
                     $action->output['fileUrl'] = $url;
